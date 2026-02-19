@@ -9,6 +9,10 @@
 # Dossier de téléchargement des providers et modules
 .terraform/
 
+# Dossier de backup
+backup_lv1/
+backup_lv2/
+
 # Fichiers d'état (State) - TRÈS IMPORTANT
 # Bloque le state local et les dossiers de Workspaces (prod/staging)
 *.tfstate
