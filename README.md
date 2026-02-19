@@ -103,5 +103,53 @@ ansible-playbook -i environments/prod/inventory.ini site.yml
 
 Le playbook est conçu pour être **idempotent**. Une deuxième exécution ne produira aucun changement (`changed=0`), garantissant la stabilité de l'état souhaité. Les logs de validation sont disponibles dans le dossier `/logs`.
 
-> **Note de l'Architecte** : L'utilisation de variables Jinja2 et des fichiers `all.yml` permet de basculer de la production au staging sans modifier une seule ligne de code Ansible, respectant ainsi les meilleures pratiques de l'industrie.
+> **Note** : L'utilisation de variables Jinja2 et des fichiers `all.yml` permet de basculer de la production au staging sans modifier une seule ligne de code Ansible, respectant ainsi les meilleures pratiques de l'industrie.
 
+---
+
+## 📂 Structure Globale du Projet
+
+---
+
+## 🛠️ Partie Terraform : "Le Créateur"
+
+C'est ici que l'on construit les fondations (les VMs).
+
+* **`main.tf`** : **Le plan de construction.** C’est le fichier principal où tu définis tes ressources (VM Web, VM DB) et où tu demandes à Terraform de créer le fichier d'inventaire Ansible à la fin.
+* **`variables.tf`** : **Le dictionnaire.** Il définit quelles données sont nécessaires pour faire marcher le projet (IPs, IDs de template, passerelle). Il ne contient pas les valeurs secrètes, juste le "nom" des variables.
+* **`provider.tf`** : **Le connecteur.** Il explique à Terraform comment parler à l'API de Proxmox (URL, authentification).
+* **`outputs.tf`** : **Le haut-parleur.** Il affiche les informations importantes (comme les IPs des VMs) dans ton terminal une fois que tout est terminé.
+* **`inventory.tftpl`** : **Le template.** C’est un modèle de fichier. Terraform s'en sert pour remplir les IPs réelles et créer le fichier `inventory.ini` final pour Ansible.
+* **`.terraform.lock.hcl`** : **L'assurance vie.** Il verrouille la version des plugins Proxmox utilisés pour éviter que tout casse si le plugin est mis à jour un jour.
+* **`.gitignore`** : **Le videur.** Il empêche Git d'envoyer tes fichiers sensibles (mots de passe, états Terraform) sur Internet.
+
+---
+
+## ⚙️ Partie Ansible : "L'aménageur"
+
+C'est ici que l'on configure l'intérieur des VMs.
+
+### 🌍 `environments/`
+
+C'est ici que tu gères les différentes "personnalités" de ton infrastructure.
+
+* **`prod/group_vars/all.yml`** : Contient les réglages spécifiques à la **Production** (Couleur rouge, message de bienvenue "PROD").
+* **`staging/group_vars/all.yml`** : Contient les réglages du **Staging** (Couleur bleue, message "STAGING").
+
+### 🎭 `roles/`
+
+C'est la découpe du travail par métier pour éviter de tout mélanger.
+
+* **`common/tasks/main.yml`** : **Le socle commun.** Configuration du pare-feu **UFW** et installation des outils nécessaires sur *tous* les serveurs (Web et DB).
+* **`db/tasks/main.yml`** : **Le rôle Database.** Installation de **MariaDB**, sécurisation du port 3306 (limité au Web) et mise en place du **Cron de backup**.
+* **`web/`** : **Le rôle Web.**
+* **`tasks/main.yml`** : Liste les étapes (Installer Nginx, générer SSL, copier le site).
+* **`handlers/main.yml`** : Contient le déclencheur pour **redémarrer Nginx** uniquement si la configuration a changé.
+* **`templates/`** : Contient les fichiers dynamiques.
+* `index.html.j2` : Ta page "de tes morts" qui change de couleur selon l'environnement.
+* `nginx.conf.j2` : La config Nginx qui gère le **HTTPS** et la redirection.
+
+### 📜 Fichiers Racines Ansible
+
+* **`site.yml`** : **Le Chef d'Orchestre.** C'est le fichier que tu lances. Il dit quel rôle appliquer à quel serveur (ex: "Applique le rôle `web` aux serveurs du groupe `[webservers]`").
+* **`ansible.cfg`** : **La télécommande.** Définit les paramètres par défaut d'Ansible (quel utilisateur utiliser par défaut, désactiver la vérification des clés SSH pour le TP, etc.).
