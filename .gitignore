@@ -1,13 +1,42 @@
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-.terraform.lock.hcl
-
-# Ansible
-*.retry
-
-# Divers
-.DS_Store
+# --- GENERAL ---
+*.bak
 *.log
+.DS_Store
+
+# --- TERRAFORM ---
+# Dossier contenant les plugins providers (très lourd)
+terraform/.terraform/
+
+# Fichiers d'état (Contiennent des infos sensibles sur ton infra)
+terraform/*.tfstate
+terraform/*.tfstate.*
+
+# Fichiers de variables sensibles (Le Graal des secrets : API Tokens, etc.)
+# C'est ici que se trouve ton proxmox_api_token
+terraform/*.tfvars
+terraform/*.tfvars.json
+
+# Fichiers de variables d'override
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+terraform/*_override.tf.json
+
+# --- ANSIBLE ---
+# Fichiers créés en cas d'échec d'un playbook
+ansible/*.retry
+
+# Configuration locale (contient l'arrêt de la vérification SSH)
+# Optionnel : garde-le si tu veux que ton équipe ait la même config, 
+# ignore-le si c'est spécifique à ton noeud de management.
+# ansible/ansible.cfg
+
+# Si Terraform génère l'inventaire dynamiquement, on peut l'ignorer
+# car il est recréé à chaque apply.
+# ansible/inventory.ini
+
+# --- SÉCURITÉ ---
+# Ne jamais inclure de clés privées ou publiques dans le repo
+**/*.pub
+**/id_ed25519
+**/id_rsa

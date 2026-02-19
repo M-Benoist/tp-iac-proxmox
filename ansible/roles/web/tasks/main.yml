@@ -1,0 +1,14 @@
+- name: Installer Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Déployer la page index dynamique
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+
+- name: Démarrer Nginx
+  service:
+    name: nginx
+    state: started

@@ -1,0 +1,18 @@
+---
+- name: Configuration de l'infrastructure
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+- name: Configuration Web
+  hosts: webservers
+  become: yes
+  roles:
+    - web
+
+- name: Configuration DB
+  hosts: dbservers
+  become: yes
+  roles:
+    - db

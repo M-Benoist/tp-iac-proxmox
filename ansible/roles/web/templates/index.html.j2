@@ -1,0 +1,7 @@
+<html>
+    <body>
+        <h1>Bienvenue sur le Serveur Web de tes morts</h1>
+        <p>Mon adresse IP de ses morts est : {{ ansible_host }}</p>
+        <p>Le serveur de base de données de ses morts se trouve à : {{ hostvars['vm-db-tp']['ansible_host'] }}</p>
+    </body>
+</html>

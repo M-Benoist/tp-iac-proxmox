@@ -14,7 +14,3 @@ provider "proxmox" {
   api_token = var.proxmox_api_token
   insecure  = true # À garder si ton certificat Proxmox est auto-signé
 }
-
-# Déclaration des variables de connexion (remplies par ton .tfvars)
-variable "proxmox_api_url" { type = string }
-variable "proxmox_api_token" { type = string }

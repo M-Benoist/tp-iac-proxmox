@@ -1,8 +1,8 @@
 # --- terraform/main.tf ---
 
 locals {
-  target_node = "srv-pve-01" # <<-- Ton nom de noeud vérifié tout à l'heure
-  template_id = 9000  # <<-- L'ID de ton template Cloud-Init
+  target_node = var.target_node
+  template_id = var.template_id
   ssh_key     = trimspace(file("~/.ssh/id_ed25519.pub"))
 }
 
@@ -17,7 +17,7 @@ resource "proxmox_virtual_environment_vm" "vm_web" {
 
   clone {
     vm_id = local.template_id
-# Optionnel mais recommandé : 
+# Optionnel mais recommandé :
     full = true
   }
 
@@ -31,8 +31,8 @@ resource "proxmox_virtual_environment_vm" "vm_web" {
 
     ip_config {
       ipv4 {
-        address = "192.168.50.242/24"
-        gateway = "192.168.50.1"
+        address = var.web_ip
+        gateway = var.gateway
       }
     }
     user_account {
@@ -57,7 +57,7 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
 
   clone {
     vm_id = local.template_id
-# Optionnel mais recommandé : 
+# Optionnel mais recommandé :
     full = true
   }
 
@@ -70,8 +70,8 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
     datastore_id = "vmstorage" # <<-- REMPLACE PAR TON NOM DE STOCKAGE
     ip_config {
       ipv4 {
-        address = "192.168.50.241/24"
-        gateway = "192.168.50.1"
+        address = var.db_ip
+        gateway = var.gateway
       }
     }
     user_account {
@@ -83,4 +83,13 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
   network_device {
     bridge = "vmbr0"
   }
+
+}
+resource "local_file" "ansible_inventory" {
+  content = templatefile("inventory.tftpl", {
+    # On retire le /24 de l'IP pour Ansible avec split
+    web_ip = split("/", var.web_ip)[0],
+    db_ip  = split("/", var.db_ip)[0]
+  })
+  filename = "../ansible/inventory.ini"
 }
