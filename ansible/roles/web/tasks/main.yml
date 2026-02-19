@@ -33,10 +33,10 @@
     dest: /etc/nginx/sites-available/default
   notify: Redémarrer Nginx
 
-- name: Déployer la page index dynamique (Architect version)
+- name: Déployer la page index dynamique
   template:
     src: index.html.j2
-    dest: /var/www/html/index.html # <--- On le nomme bien index.html
+    dest: /var/www/html/index.html
     owner: www-data
     group: www-data
     mode: '0644'
