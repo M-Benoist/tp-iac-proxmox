@@ -1,5 +1,3 @@
----
-
 # TP Infrastructure as Code : Déploiement Sécurisé Staging & Prod
 
 Ce projet implémente une infrastructure complète, automatisée et sécurisée utilisant **Terraform** pour le provisionnement et **Ansible** pour la configuration. L'objectif est de déployer une architecture Web + Database isolée, avec une gestion stricte des environnements.
@@ -107,9 +105,7 @@ Le playbook est conçu pour être **idempotent**. Une deuxième exécution ne pr
 
 ---
 
-## 📂 Structure Globale du Projet
-
----
+# 📂 Structure Globale du Projet
 
 ## 🛠️ Partie Terraform : "Le Créateur"
 
