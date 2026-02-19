@@ -1,6 +1,12 @@
 ---
 - name: Configuration de l'infrastructure
   hosts: all
+  gather_facts: no # On ne peut pas gather facts si SSH n'est pas prêt !
+  tasks:
+    - name: Attendre que les VMs soient joignables en SSH
+      ansible.builtin.wait_for_connection:
+        delay: 5
+        timeout: 300 # On attend jusqu'à 5 minutes si besoin
   become: yes
   roles:
     - common
@@ -16,3 +22,22 @@
   become: yes
   roles:
     - db
+
+- name: 🏁 Récapitulatif final de l'infrastructure
+  hosts: webservers
+  gather_facts: no  # Pas besoin de perdre du temps à regénérer les facts
+  tasks:
+    - name: "Affichage des accès de {{ env_label }}"
+      ansible.builtin.debug:
+        msg:
+          - "###############################################################"
+          - "#      DÉPLOIEMENT TERMINÉ AVEC SUCCÈS ({{ env_label }})         "
+          - "###############################################################"
+          - ""
+          - "  🌐 URL DU SERVEUR WEB : https://{{ ansible_host }}"
+          - "  💬 MESSAGE : {{ welcome_message }}"
+          - "  🛡️  SÉCURITÉ : HTTPS actif & Firewall configuré"
+          - "  💾 BACKUP : Cron job activé sur la base de données"
+          - ""
+          - "  Le serveur de tes morts est prêt pour la production !"
+          - "###############################################################"

@@ -1,0 +1,4 @@
+env_label: "STAGING"
+welcome_message: "Bienvenue sur le Serveur Web STAGING de tes morts"
+page_color: "#4d94ff"  # Un bleu pour le test
+backup_enabled: false

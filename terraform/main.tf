@@ -11,24 +11,24 @@ resource "proxmox_virtual_environment_vm" "vm_web" {
   name      = "vm-web-${var.env}" # <- Dynamique
   node_name = local.target_node
   vm_id     = var.web_vm_id       # <- Dynamique
-
-# On force Terraform à attendre un peu et à démarrer la VM
   started = true
 
   clone {
     vm_id = local.template_id
-# Optionnel mais recommandé :
     full = true
   }
 
+  disk {
+    datastore_id = "vmstorage" 
+    interface    = "scsi0"
+    size         = 10
+  }
+
   initialization {
-# AJOUTE CE BLOC DNS
     dns {
       servers = ["1.1.1.1", "8.8.8.8"] # DNS Cloudflare et Google
     }
-# Assure-toi que cette section est bien là
-    datastore_id = "vmstorage" # <<-- REMPLACE PAR TON NOM DE STOCKAGE
-
+    datastore_id = "vmstorage"
     ip_config {
       ipv4 {
         address = var.web_ip
@@ -51,23 +51,24 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
   name      = "vm-db-${var.env}" # <- Dynamique
   node_name = local.target_node
   vm_id     = var.db_vm_id       # <- Dynamique
-
-# On force Terraform à attendre un peu et à démarrer la VM
   started = true
 
   clone {
     vm_id = local.template_id
-# Optionnel mais recommandé :
     full = true
   }
 
+  disk {
+    datastore_id = "vmstorage"
+    interface    = "scsi0"
+    size         = 10
+  }
+
   initialization {
-# AJOUTE CE BLOC DNS
     dns {
-      servers = ["1.1.1.1", "8.8.8.8"] # DNS Cloudflare et Google
+      servers = ["1.1.1.1", "8.8.8.8"]
     }
-# Assure-toi que cette section est bien là
-    datastore_id = "vmstorage" # <<-- REMPLACE PAR TON NOM DE STOCKAGE
+    datastore_id = "vmstorage"
     ip_config {
       ipv4 {
         address = var.db_ip
@@ -87,11 +88,9 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
 }
 resource "local_file" "ansible_inventory" {
   content = templatefile("inventory.tftpl", {
-    # On passe l'IP sans le masque et le nom de l'env au template
     web_ip = split("/", var.web_ip)[0],
     db_ip  = split("/", var.db_ip)[0],
     env    = var.env
   })
-  # Le fichier sera créé dans ansible/environments/prod/inventory.ini par exemple
   filename = "../ansible/environments/${var.env}/inventory.ini"
 }

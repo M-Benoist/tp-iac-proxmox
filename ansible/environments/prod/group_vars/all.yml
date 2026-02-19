@@ -1,0 +1,4 @@
+env_label: "PRODUCTION"
+welcome_message: "Bienvenue sur le Serveur Web PROD de tes morts"
+page_color: "#ff4d4d"  # Un rouge pro pour la prod
+backup_enabled: true
