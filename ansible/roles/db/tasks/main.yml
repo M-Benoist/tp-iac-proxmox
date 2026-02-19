@@ -1,0 +1,41 @@
+# 1. INSTALLATION DU MOTEUR (Ce qui manquait)
+- name: Installer MariaDB Server
+  apt:
+    name:
+      - mariadb-server
+      - python3-mysqldb  # Nécessaire pour qu'Ansible puisse gérer MySQL
+    state: present
+    update_cache: yes
+
+- name: S'assurer que MariaDB est démarré
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+# 2. SÉCURITÉ : FIREWALL
+- name: UFW - Autoriser MySQL uniquement depuis le serveur Web
+  community.general.ufw:
+    rule: allow
+    port: '3306'
+    proto: tcp
+    from_ip: "{{ hostvars[groups['webservers'][0]]['ansible_host'] }}"
+  # Cette règle est dynamique : elle s'adapte à l'IP de la prod ou du staging
+
+# 3. IDEMPOTENCE : DOSSIER DE BACKUP
+- name: Créer le dossier de sauvegarde
+  file:
+    path: /backups
+    state: directory
+    owner: root
+    group: root
+    mode: '0700' # Seul root peut voir les backups
+
+# 4. CRON JOB (Sauvegarde automatique)
+- name: Programmer la sauvegarde de la base de données
+  ansible.builtin.cron:
+    name: "DB Backup Simulation"
+    minute: "0"
+    hour: "2"
+    job: "mysqldump --all-databases > /backups/db_backup_$(date +%F).sql"
+    state: present

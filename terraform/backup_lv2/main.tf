@@ -8,9 +8,9 @@ locals {
 
 # VM WEB
 resource "proxmox_virtual_environment_vm" "vm_web" {
-  name      = "vm-web-${var.env}" # <- Dynamique
+  name      = "vm-web-tp"
   node_name = local.target_node
-  vm_id     = var.web_vm_id       # <- Dynamique
+  vm_id     = 302
 
 # On force Terraform à attendre un peu et à démarrer la VM
   started = true
@@ -48,9 +48,9 @@ resource "proxmox_virtual_environment_vm" "vm_web" {
 
 # VM DATABASE
 resource "proxmox_virtual_environment_vm" "vm_db" {
-  name      = "vm-db-${var.env}" # <- Dynamique
+  name      = "vm-db-tp"
   node_name = local.target_node
-  vm_id     = var.db_vm_id       # <- Dynamique
+  vm_id     = 303
 
 # On force Terraform à attendre un peu et à démarrer la VM
   started = true
@@ -87,11 +87,9 @@ resource "proxmox_virtual_environment_vm" "vm_db" {
 }
 resource "local_file" "ansible_inventory" {
   content = templatefile("inventory.tftpl", {
-    # On passe l'IP sans le masque et le nom de l'env au template
+    # On retire le /24 de l'IP pour Ansible avec split
     web_ip = split("/", var.web_ip)[0],
-    db_ip  = split("/", var.db_ip)[0],
-    env    = var.env
+    db_ip  = split("/", var.db_ip)[0]
   })
-  # Le fichier sera créé dans ansible/environments/prod/inventory.ini par exemple
-  filename = "../ansible/environments/${var.env}/inventory.ini"
+  filename = "../ansible/inventory.ini"
 }

@@ -1,0 +1,8 @@
+[webservers]
+vm-web-tp ansible_host=${web_ip} ansible_user=deploy
+
+[dbservers]
+vm-db-tp ansible_host=${db_ip} ansible_user=deploy
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

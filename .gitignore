@@ -1,42 +1,48 @@
-# --- GENERAL ---
-*.bak
+# --- GÉNÉRAL ---
+*.tar.gz
 *.log
+*.bak
+*.tmp
 .DS_Store
 
 # --- TERRAFORM ---
-# Dossier contenant les plugins providers (très lourd)
-terraform/.terraform/
+# Dossier de téléchargement des providers et modules
+.terraform/
 
-# Fichiers d'état (Contiennent des infos sensibles sur ton infra)
-terraform/*.tfstate
-terraform/*.tfstate.*
+# Fichiers d'état (State) - TRÈS IMPORTANT
+# Bloque le state local et les dossiers de Workspaces (prod/staging)
+*.tfstate
+*.tfstate.*
+terraform.tfstate.d/
 
-# Fichiers de variables sensibles (Le Graal des secrets : API Tokens, etc.)
-# C'est ici que se trouve ton proxmox_api_token
-terraform/*.tfvars
-terraform/*.tfvars.json
-
-# Fichiers de variables d'override
-terraform/override.tf
-terraform/override.tf.json
-terraform/*_override.tf
-terraform/*_override.tf.json
+# Fichiers de variables sensibles
+# On ignore spécifiquement le fichier de secrets et tous les .tfvars 
+# pour éviter de push des IPs ou des tokens par erreur.
+secret.tfvars
+*.tfvars
+# Sauf si tu veux versionner tes configs non-sensibles, utilise alors :
+# !prod.tfvars
+# !staging.tfvars
 
 # --- ANSIBLE ---
-# Fichiers créés en cas d'échec d'un playbook
-ansible/*.retry
+# Ignorer les inventaires GÉNÉRÉS par Terraform
+# On ne versionne pas ce qui est auto-généré
+ansible/environments/*/inventory.ini
 
-# Configuration locale (contient l'arrêt de la vérification SSH)
-# Optionnel : garde-le si tu veux que ton équipe ait la même config, 
-# ignore-le si c'est spécifique à ton noeud de management.
+# Fichiers de retry en cas d'échec
+*.retry
+
+# Configuration Ansible (si elle contient des chemins locaux)
 # ansible/ansible.cfg
 
-# Si Terraform génère l'inventaire dynamiquement, on peut l'ignorer
-# car il est recréé à chaque apply.
-# ansible/inventory.ini
-
 # --- SÉCURITÉ ---
-# Ne jamais inclure de clés privées ou publiques dans le repo
+# Clés SSH et certificats (on ne push jamais de clés privées !)
+**/*.key
+**/*.pem
 **/*.pub
-**/id_ed25519
-**/id_rsa
+id_rsa
+id_ed25519
+
+# Certificats générés (Ansible les recréera)
+**/*.crt
+**/*.csr

@@ -1,0 +1,15 @@
+- name: Installer UFW
+  apt:
+    name: ufw
+    state: present
+
+- name: UFW - Autoriser SSH (Indispensable pour ne pas être lock-out)
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: UFW - Politique par défaut "DENY" (Tout bloquer)
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
