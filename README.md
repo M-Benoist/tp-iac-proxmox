@@ -10,6 +10,9 @@ Ce projet implémente une infrastructure complète, automatisée et sécurisée 
 2. **Terraform** : Crée les VMs sur Proxmox, configure le réseau et génère dynamiquement l'inventaire Ansible.
 3. **Ansible** : Se connecte en SSH via l'utilisateur `deploy`, configure les services (Nginx, MariaDB), sécurise le système (HTTPS, UFW) et met en place les automatisations (Cron).
 
+
+<img width="825" height="1581" alt="schéma_terraform-ansible drawio" src="https://github.com/user-attachments/assets/e6926872-1e17-4090-8134-b0e4ff73b450" />
+
 ---
 
 ## 🛠️ Infrastructure (Terraform)
